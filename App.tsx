@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Activity, 
-  AlertTriangle, 
-  CheckCircle, 
-  ChevronRight, 
-  ChevronLeft, 
-  Droplet, 
+import {
+  Activity,
+  AlertTriangle,
+  CheckCircle,
+  ChevronRight,
+  ChevronLeft,
+  Droplet,
   FileText,
-  Syringe, 
+  Syringe,
   Pill,
   Info,
   Calculator,
@@ -15,14 +15,15 @@ import {
   XCircle,
   Stethoscope,
   Thermometer,
-  ShieldAlert
+  ShieldAlert,
+  User
 } from 'lucide-react';
 import { PatientGroup, Gender, Stage, PatientState, DecisionResult } from './types';
-import { 
-  evaluateScreening, 
-  evaluateIronTherapy, 
-  evaluateWorkup, 
-  evaluateESA 
+import {
+  evaluateScreening,
+  evaluateIronTherapy,
+  evaluateWorkup,
+  evaluateESA
 } from './utils/decisionEngine';
 
 // --- Reusable Components (Optimized for Design) ---
@@ -78,7 +79,7 @@ const Checkbox = ({ label, checked, onChange, variant = 'default' }: { label: st
   }
 
   return (
-    <div 
+    <div
       className={`flex items-start md:items-center p-4 border rounded-xl cursor-pointer transition-all duration-200 group
         ${checked ? activeClass : 'bg-white border-slate-200 hover:border-indigo-300 hover:bg-slate-50 hover:shadow-sm'}`}
       onClick={() => onChange(!checked)}
@@ -108,7 +109,7 @@ const ResultBox = ({ result }: { result: DecisionResult | null }) => {
   };
 
   const type = result.recommendationType || 'info';
-  
+
   return (
     <div className={`p-6 md:p-8 rounded-r-2xl shadow-sm flex flex-col md:flex-row gap-6 ${styles[type]} mt-10 animate-fade-in`}>
       <div className={`w-14 h-14 shrink-0 rounded-full flex items-center justify-center ${iconContainerStyles[type]} shadow-inner`}>
@@ -178,7 +179,7 @@ export default function App() {
   const [recommendation, setRecommendation] = useState<DecisionResult | null>(null);
   const [showCalculator, setShowCalculator] = useState(false);
   const [logoError, setLogoError] = useState(false);
-  
+
   const [esaStep, setEsaStep] = useState(1);
   const tier2Ref = useRef<HTMLDivElement>(null);
   const tier3Ref = useRef<HTMLDivElement>(null);
@@ -232,7 +233,7 @@ export default function App() {
     const currentIron = field === 'serumIron' ? numValue : patient.serumIron;
     const currentTibc = field === 'tibc' ? numValue : patient.tibc;
     let newTsat = patient.tsat;
-    
+
     if (currentIron !== '' && currentTibc !== '' && currentTibc !== 0) {
       newTsat = Math.round(((currentIron as number) / (currentTibc as number)) * 100);
     }
@@ -297,7 +298,7 @@ export default function App() {
     if (stage === Stage.Screening && (!patient.hb || !patient.gender || !patient.group)) return false;
     if (stage === Stage.IronTherapy && (patient.tsat === '' || patient.ferritin === '')) return false;
     if (stage === Stage.FullWorkup) {
-      const hasSelection = patient.workupAllNegative || 
+      const hasSelection = patient.workupAllNegative ||
         patient.workupSmear || patient.workupHemolysis || patient.workupInflammation ||
         patient.workupB12Folate || patient.workupLiver || patient.workupThyroid ||
         patient.workupParathyroid || patient.workupMyeloma || patient.workupParasites;
@@ -315,14 +316,14 @@ export default function App() {
         {/* Decorative Background Circles */}
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-white/5 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-60 h-60 rounded-full bg-white/10 blur-2xl"></div>
-        
+
         <div className="max-w-4xl mx-auto flex items-center justify-between relative z-10">
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold flex items-center gap-4 tracking-tight drop-shadow-sm">
               <div className="w-14 h-14 md:w-16 md:h-16 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-white/20 shrink-0 overflow-hidden p-1">
                 {!logoError ? (
-                  <img 
-                    src="https://upload.wikimedia.org/wikipedia/zh/thumb/3/3a/Changhua_Christian_Hospital_logo.svg/240px-Changhua_Christian_Hospital_logo.svg.png" 
+                  <img
+                    src="/cch_logo.png"
                     alt="Changhua Christian Medical Foundation Logo"
                     className="w-full h-full object-contain"
                     referrerPolicy="no-referrer"
@@ -347,41 +348,48 @@ export default function App() {
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto mt-10 px-4 md:px-6">
-        
+
         {/* Progress Stepper - Optimized Visuals */}
-        <div className="mb-14 flex justify-between items-center relative px-2 md:px-8">
-          <div className="absolute top-1/2 left-0 w-full h-1.5 bg-slate-200 -z-0 rounded-full"></div>
-          {stages.map((s, idx) => {
-            const isActive = stage === s.id;
-            const isPast = stage > s.id;
-            return (
-              <div key={s.id} className="relative z-10 flex flex-col items-center group">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-xl transition-all duration-300 shadow-md
-                  ${isActive ? 'bg-indigo-600 text-white shadow-indigo-200 scale-110 ring-4 ring-indigo-50 rotate-3' : 
-                    isPast ? 'bg-indigo-50 text-indigo-600 border-2 border-indigo-100' : 'bg-white text-slate-300 border-2 border-slate-100'}
-                `}>
-                  {isPast ? <CheckCircle className="w-7 h-7" /> : s.id}
-                </div>
-                <span className={`text-sm mt-3 font-bold uppercase tracking-wide transition-colors ${isActive ? 'text-indigo-700' : 'text-slate-400'}`}>
-                  {s.label}
-                </span>
-              </div>
-            );
-          })}
+        {/* Progress Stepper - Optimized Visuals & Sticky Navigation */}
+        <div className="sticky top-0 z-40 bg-slate-100/95 backdrop-blur-sm py-4 -mx-4 md:-mx-6 px-4 md:px-14 mb-10 shadow-sm border-b border-slate-200/50 transition-all">
+          <div className="flex justify-between items-center relative max-w-4xl mx-auto">
+            <div className="absolute top-1/2 left-0 w-full h-1.5 bg-slate-200 -z-0 rounded-full"></div>
+            {stages.map((s, idx) => {
+              const isActive = stage === s.id;
+              const isPast = stage > s.id;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => setStage(s.id)}
+                  className="relative z-10 flex flex-col items-center group cursor-pointer focus:outline-none"
+                >
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-xl transition-all duration-300 shadow-md group-hover:scale-105
+                    ${isActive ? 'bg-indigo-600 text-white shadow-indigo-200 scale-110 ring-4 ring-indigo-50 rotate-3' :
+                      isPast ? 'bg-indigo-50 text-indigo-600 border-2 border-indigo-100 group-hover:bg-indigo-100' : 'bg-white text-slate-300 border-2 border-slate-100 group-hover:border-indigo-200 group-hover:text-slate-400'}
+                  `}>
+                    {isPast ? <CheckCircle className="w-7 h-7" /> : s.id}
+                  </div>
+                  <span className={`text-sm mt-3 font-bold uppercase tracking-wide transition-colors ${isActive ? 'text-indigo-700' : 'text-slate-400 group-hover:text-slate-500'}`}>
+                    {s.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Dynamic Stage Content */}
         <Card className="p-6 md:p-12 animate-fade-in-up border-t-[8px] border-t-indigo-500">
-          
+
           {/* STAGE 1: SCREENING */}
           {stage === Stage.Screening && (
             <div className="space-y-10">
               <div className="border-b border-slate-100 pb-6 mb-2">
                 <div className="flex items-center gap-4 mb-3">
-                    <div className="p-3 bg-sky-100 rounded-xl text-sky-600">
-                        <Droplet className="w-8 h-8" strokeWidth={2.5} />
-                    </div>
-                    <h2 className="text-3xl font-bold text-slate-800">Patient Demographics & Labs</h2>
+                  <div className="p-3 bg-sky-100 rounded-xl text-sky-600">
+                    <Droplet className="w-8 h-8" strokeWidth={2.5} />
+                  </div>
+                  <h2 className="text-3xl font-bold text-slate-800">Patient Demographics & Labs</h2>
                 </div>
                 <p className="text-slate-500 text-lg pl-1">Enter initial parameters to stratify patient risk.</p>
               </div>
@@ -389,8 +397,8 @@ export default function App() {
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   <Label>Patient Stratification (CKD Stage)</Label>
-                  <Select 
-                    value={patient.group || ''} 
+                  <Select
+                    value={patient.group || ''}
                     onChange={(e) => updatePatient('group', e.target.value as PatientGroup)}
                   >
                     <option value="" disabled>Select Cohort...</option>
@@ -401,8 +409,8 @@ export default function App() {
                 </div>
                 <div>
                   <Label>Biological Sex</Label>
-                  <Select 
-                    value={patient.gender || ''} 
+                  <Select
+                    value={patient.gender || ''}
                     onChange={(e) => updatePatient('gender', e.target.value as Gender)}
                   >
                     <option value="" disabled>Select Sex...</option>
@@ -413,11 +421,11 @@ export default function App() {
                 </div>
                 <div className="md:col-span-1">
                   <Label icon={<Thermometer className="w-4 h-4" />}>Hemoglobin Concentration (Hb) [g/dL]</Label>
-                  <Input 
-                    type="number" 
-                    placeholder="e.g. 10.5" 
-                    value={patient.hb} 
-                    onChange={(e) => updatePatient('hb', e.target.value === '' ? '' : parseFloat(e.target.value))} 
+                  <Input
+                    type="number"
+                    placeholder="e.g. 10.5"
+                    value={patient.hb}
+                    onChange={(e) => updatePatient('hb', e.target.value === '' ? '' : parseFloat(e.target.value))}
                   />
                 </div>
               </div>
@@ -429,74 +437,74 @@ export default function App() {
             <div className="space-y-10">
               <div className="border-b border-slate-100 pb-6 mb-2">
                 <div className="flex items-center gap-4 mb-3">
-                    <div className="p-3 bg-indigo-100 rounded-xl text-indigo-600">
-                        <Syringe className="w-8 h-8" strokeWidth={2.5} />
-                    </div>
-                    <h2 className="text-3xl font-bold text-slate-800">Iron Status Assessment</h2>
+                  <div className="p-3 bg-indigo-100 rounded-xl text-indigo-600">
+                    <Syringe className="w-8 h-8" strokeWidth={2.5} />
+                  </div>
+                  <h2 className="text-3xl font-bold text-slate-800">Iron Status Assessment</h2>
                 </div>
                 <p className="text-slate-500 text-lg pl-1">Evaluate absolute and functional iron deficiency.</p>
               </div>
 
               <div className="grid md:grid-cols-2 gap-8">
-                 <div>
+                <div>
                   <Label>Serum Ferritin [ng/ml]</Label>
-                  <Input 
-                    type="number" 
-                    placeholder="e.g. 50" 
-                    value={patient.ferritin} 
-                    onChange={(e) => updatePatient('ferritin', e.target.value === '' ? '' : parseFloat(e.target.value))} 
+                  <Input
+                    type="number"
+                    placeholder="e.g. 50"
+                    value={patient.ferritin}
+                    onChange={(e) => updatePatient('ferritin', e.target.value === '' ? '' : parseFloat(e.target.value))}
                   />
                 </div>
-                 <div>
+                <div>
                   <Label>Transferrin Saturation (TSAT) [%]</Label>
-                  <Input 
-                    type="number" 
-                    placeholder="e.g. 20" 
-                    value={patient.tsat} 
-                    onChange={(e) => updatePatient('tsat', e.target.value === '' ? '' : parseFloat(e.target.value))} 
+                  <Input
+                    type="number"
+                    placeholder="e.g. 20"
+                    value={patient.tsat}
+                    onChange={(e) => updatePatient('tsat', e.target.value === '' ? '' : parseFloat(e.target.value))}
                   />
                 </div>
-                
+
                 {/* TSAT Calculator Section */}
                 <div className="md:col-span-2">
-                   <button 
-                     type="button"
-                     onClick={() => setShowCalculator(!showCalculator)}
-                     className="flex items-center text-base font-bold text-indigo-600 hover:text-indigo-800 transition-all mb-4 group bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg"
-                   >
-                     <Calculator className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                     {showCalculator ? 'Hide Calculator' : 'Calculate TSAT from Serum Iron & TIBC'}
-                   </button>
-                   
-                   {showCalculator && (
-                     <div className="bg-slate-50/80 p-6 rounded-2xl border border-slate-200 grid grid-cols-2 gap-6 animate-fade-in shadow-inner">
-                        <div className="col-span-2 text-slate-500 text-sm mb-1 flex items-center gap-2 font-medium">
-                          <Info className="w-4 h-4 text-indigo-400" /> Formula: TSAT = (Serum Iron / TIBC) × 100
-                        </div>
-                        <div>
-                          <label className="block text-sm font-bold text-slate-600 mb-2">Serum Iron [µg/dL]</label>
-                          <Input 
-                            type="number" 
-                            placeholder="e.g. 60"
-                            value={patient.serumIron}
-                            onChange={(e) => handleCalculatorUpdate('serumIron', e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-bold text-slate-600 mb-2">Total Iron Binding Capacity (TIBC) [µg/dL]</label>
-                          <Input 
-                            type="number" 
-                            placeholder="e.g. 300"
-                            value={patient.tibc}
-                            onChange={(e) => handleCalculatorUpdate('tibc', e.target.value)}
-                          />
-                        </div>
-                     </div>
-                   )}
+                  <button
+                    type="button"
+                    onClick={() => setShowCalculator(!showCalculator)}
+                    className="flex items-center text-base font-bold text-indigo-600 hover:text-indigo-800 transition-all mb-4 group bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg"
+                  >
+                    <Calculator className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                    {showCalculator ? 'Hide Calculator' : 'Calculate TSAT from Serum Iron & TIBC'}
+                  </button>
+
+                  {showCalculator && (
+                    <div className="bg-slate-50/80 p-6 rounded-2xl border border-slate-200 grid grid-cols-2 gap-6 animate-fade-in shadow-inner">
+                      <div className="col-span-2 text-slate-500 text-sm mb-1 flex items-center gap-2 font-medium">
+                        <Info className="w-4 h-4 text-indigo-400" /> Formula: TSAT = (Serum Iron / TIBC) × 100
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Serum Iron [µg/dL]</label>
+                        <Input
+                          type="number"
+                          placeholder="e.g. 60"
+                          value={patient.serumIron}
+                          onChange={(e) => handleCalculatorUpdate('serumIron', e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Total Iron Binding Capacity (TIBC) [µg/dL]</label>
+                        <Input
+                          type="number"
+                          placeholder="e.g. 300"
+                          value={patient.tibc}
+                          onChange={(e) => handleCalculatorUpdate('tibc', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex flex-col justify-end md:col-span-2 mt-2">
-                   <Checkbox 
+                  <Checkbox
                     label="Presence of Active Systemic Infection?"
                     checked={patient.hasActiveInfection}
                     onChange={(val) => updatePatient('hasActiveInfection', val)}
@@ -507,7 +515,7 @@ export default function App() {
 
               <div className="bg-sky-50 border border-sky-100 p-5 rounded-2xl text-base text-sky-800 flex items-center gap-3 shadow-sm">
                 <div className="bg-sky-200 p-1.5 rounded-full shrink-0">
-                    <Info className="w-5 h-5 text-sky-700" />
+                  <Info className="w-5 h-5 text-sky-700" />
                 </div>
                 <span><span className="font-bold">Patient Profile Summary:</span> {patient.group} • Hb {patient.hb} g/dL</span>
               </div>
@@ -519,23 +527,23 @@ export default function App() {
             <div className="space-y-10">
               <div className="border-b border-slate-100 pb-6 mb-2">
                 <div className="flex items-center gap-4 mb-3">
-                    <div className="p-3 bg-violet-100 rounded-xl text-violet-600">
-                        <Stethoscope className="w-8 h-8" strokeWidth={2.5} />
-                    </div>
-                    <h2 className="text-3xl font-bold text-slate-800">Differential Diagnosis</h2>
+                  <div className="p-3 bg-violet-100 rounded-xl text-violet-600">
+                    <Stethoscope className="w-8 h-8" strokeWidth={2.5} />
+                  </div>
+                  <h2 className="text-3xl font-bold text-slate-800">Differential Diagnosis</h2>
                 </div>
                 <p className="text-slate-500 text-lg pl-1">Rule out secondary non-renal etiologies.</p>
               </div>
 
               <div className="space-y-6">
-                 {/* Success Case */}
-                 <Checkbox 
+                {/* Success Case */}
+                <Checkbox
                   variant="success"
                   label="Exclusion of secondary causes (Diagnosis: Anemia of CKD)"
                   checked={patient.workupAllNegative}
                   onChange={(val) => toggleWorkupItem('workupAllNegative', val)}
                 />
-                
+
                 {/* Separator */}
                 <div className="relative py-4">
                   <div className="absolute inset-0 flex items-center" aria-hidden="true">
@@ -548,55 +556,55 @@ export default function App() {
 
                 {/* Positive Findings */}
                 <div className="grid md:grid-cols-2 gap-4">
-                  <Checkbox 
+                  <Checkbox
                     label="Abnormal Peripheral Blood Smear"
                     checked={patient.workupSmear}
                     onChange={(val) => toggleWorkupItem('workupSmear', val)}
                     variant="danger"
                   />
-                  <Checkbox 
+                  <Checkbox
                     label="Hemolysis (Abnormal Haptoglobin/LDH)"
                     checked={patient.workupHemolysis}
                     onChange={(val) => toggleWorkupItem('workupHemolysis', val)}
                     variant="danger"
                   />
-                  <Checkbox 
+                  <Checkbox
                     label="Elevated CRP (Inflammation)"
                     checked={patient.workupInflammation}
                     onChange={(val) => toggleWorkupItem('workupInflammation', val)}
                     variant="danger"
                   />
-                  <Checkbox 
+                  <Checkbox
                     label="Vitamin B12 or Folate Deficiency"
                     checked={patient.workupB12Folate}
                     onChange={(val) => toggleWorkupItem('workupB12Folate', val)}
                     variant="danger"
                   />
-                  <Checkbox 
+                  <Checkbox
                     label="Hepatic Dysfunction (LFTs)"
                     checked={patient.workupLiver}
                     onChange={(val) => toggleWorkupItem('workupLiver', val)}
                     variant="danger"
                   />
-                  <Checkbox 
+                  <Checkbox
                     label="Thyroid Dysfunction (TSH)"
                     checked={patient.workupThyroid}
                     onChange={(val) => toggleWorkupItem('workupThyroid', val)}
                     variant="danger"
                   />
-                  <Checkbox 
+                  <Checkbox
                     label="Hyperparathyroidism (Elevated PTH)"
                     checked={patient.workupParathyroid}
                     onChange={(val) => toggleWorkupItem('workupParathyroid', val)}
                     variant="danger"
                   />
-                  <Checkbox 
+                  <Checkbox
                     label="Paraproteinemia (M-protein/Light chains)"
                     checked={patient.workupMyeloma}
                     onChange={(val) => toggleWorkupItem('workupMyeloma', val)}
                     variant="danger"
                   />
-                  <Checkbox 
+                  <Checkbox
                     label="Parasitic Infection (If indicated)"
                     checked={patient.workupParasites}
                     onChange={(val) => toggleWorkupItem('workupParasites', val)}
@@ -612,135 +620,135 @@ export default function App() {
             <div className="space-y-10">
               <div className="border-b border-slate-100 pb-6 mb-2">
                 <div className="flex items-center gap-4 mb-3">
-                    <div className="p-3 bg-teal-100 rounded-xl text-teal-600">
-                        <Pill className="w-8 h-8" strokeWidth={2.5} />
-                    </div>
-                    <h2 className="text-3xl font-bold text-slate-800">Pharmacological Management</h2>
+                  <div className="p-3 bg-teal-100 rounded-xl text-teal-600">
+                    <Pill className="w-8 h-8" strokeWidth={2.5} />
+                  </div>
+                  <h2 className="text-3xl font-bold text-slate-800">Pharmacological Management</h2>
                 </div>
                 <p className="text-slate-500 text-lg pl-1">Sequential assessment for ESA vs. HIF-PHI selection.</p>
               </div>
 
               <div className="space-y-12">
-                
+
                 {/* Tier 1 */}
                 <div className="bg-rose-50/50 p-6 md:p-8 rounded-2xl border border-rose-100 animate-fade-in shadow-sm">
-                   <h3 className="text-2xl font-bold text-rose-800 mb-2 flex items-center gap-3">
-                     <div className="bg-rose-200 p-1.5 rounded-lg"><ShieldAlert className="w-6 h-6 text-rose-700"/></div>
-                     Tier 1: Contraindications & Safety Profiles
-                   </h3>
-                   <p className="text-sm text-rose-600/80 mb-6 font-bold uppercase tracking-wide ml-12">Identify Major Risk Factors</p>
-                   
-                   <div className="grid md:grid-cols-2 gap-4 ml-1">
-                      <Checkbox 
-                        label="Current Stroke or Active Thrombosis"
-                        checked={patient.currentStrokeOrThrombosis}
-                        onChange={(val) => updatePatient('currentStrokeOrThrombosis', val)}
-                        variant="danger"
-                      />
-                      <Checkbox 
-                        label="Pregnancy"
-                        checked={patient.isPregnant}
-                        onChange={(val) => updatePatient('isPregnant', val)}
-                        variant="danger"
-                      />
-                      <Checkbox 
-                        label="Documented Intolerance to ESA"
-                        checked={patient.esaIntolerance}
-                        onChange={(val) => updatePatient('esaIntolerance', val)}
-                        variant="danger"
-                      />
-                      <Checkbox 
-                        label="Active Malignancy"
-                        checked={patient.activeMalignancy}
-                        onChange={(val) => updatePatient('activeMalignancy', val)}
-                        variant="danger"
-                      />
-                      <Checkbox 
-                        label="History of Malignancy (< 5yr remission)"
-                        checked={patient.historyOfCancer}
-                        onChange={(val) => updatePatient('historyOfCancer', val)}
-                        variant="danger"
-                      />
-                      <Checkbox 
-                        label="Polycystic Kidney Disease (ADPKD)"
-                        checked={patient.polycysticKidneyDisease}
-                        onChange={(val) => updatePatient('polycysticKidneyDisease', val)}
-                        variant="danger"
-                      />
-                      <Checkbox 
-                        label="Proliferative Retinopathy"
-                        checked={patient.proliferativeRetinalDisease}
-                        onChange={(val) => updatePatient('proliferativeRetinalDisease', val)}
-                        variant="danger"
-                      />
-                      <Checkbox 
-                        label="Pulmonary Arterial Hypertension (PAH)"
-                        checked={patient.pulmonaryArterialHypertension}
-                        onChange={(val) => updatePatient('pulmonaryArterialHypertension', val)}
-                        variant="danger"
-                      />
-                      <Checkbox 
-                        label="Hepatic Impairment (Child-Pugh B/C)"
-                        checked={patient.hepaticImpairment}
-                        onChange={(val) => updatePatient('hepaticImpairment', val)}
-                        variant="danger"
-                      />
-                      <Checkbox 
-                        label="History of CV Events (Stroke/MI)"
-                        checked={patient.priorCVEvents}
-                        onChange={(val) => updatePatient('priorCVEvents', val)}
-                        variant="danger"
-                      />
-                      <Checkbox 
-                        label="History of Thromboembolism (DVT/PE)"
-                        checked={patient.priorThromboembolicEvents}
-                        onChange={(val) => updatePatient('priorThromboembolicEvents', val)}
-                        variant="danger"
-                      />
-                   </div>
-                   
-                   {esaStep === 1 && (
-                     <div className="mt-8 flex justify-end">
-                       <button
+                  <h3 className="text-2xl font-bold text-rose-800 mb-2 flex items-center gap-3">
+                    <div className="bg-rose-200 p-1.5 rounded-lg"><ShieldAlert className="w-6 h-6 text-rose-700" /></div>
+                    Tier 1: Contraindications & Safety Profiles
+                  </h3>
+                  <p className="text-sm text-rose-600/80 mb-6 font-bold uppercase tracking-wide ml-12">Identify Major Risk Factors</p>
+
+                  <div className="grid md:grid-cols-2 gap-4 ml-1">
+                    <Checkbox
+                      label="Current Stroke or Active Thrombosis"
+                      checked={patient.currentStrokeOrThrombosis}
+                      onChange={(val) => updatePatient('currentStrokeOrThrombosis', val)}
+                      variant="danger"
+                    />
+                    <Checkbox
+                      label="Pregnancy"
+                      checked={patient.isPregnant}
+                      onChange={(val) => updatePatient('isPregnant', val)}
+                      variant="danger"
+                    />
+                    <Checkbox
+                      label="Documented Intolerance to ESA"
+                      checked={patient.esaIntolerance}
+                      onChange={(val) => updatePatient('esaIntolerance', val)}
+                      variant="danger"
+                    />
+                    <Checkbox
+                      label="Active Malignancy"
+                      checked={patient.activeMalignancy}
+                      onChange={(val) => updatePatient('activeMalignancy', val)}
+                      variant="danger"
+                    />
+                    <Checkbox
+                      label="History of Malignancy (< 5yr remission)"
+                      checked={patient.historyOfCancer}
+                      onChange={(val) => updatePatient('historyOfCancer', val)}
+                      variant="danger"
+                    />
+                    <Checkbox
+                      label="Polycystic Kidney Disease (ADPKD)"
+                      checked={patient.polycysticKidneyDisease}
+                      onChange={(val) => updatePatient('polycysticKidneyDisease', val)}
+                      variant="danger"
+                    />
+                    <Checkbox
+                      label="Proliferative Retinopathy"
+                      checked={patient.proliferativeRetinalDisease}
+                      onChange={(val) => updatePatient('proliferativeRetinalDisease', val)}
+                      variant="danger"
+                    />
+                    <Checkbox
+                      label="Pulmonary Arterial Hypertension (PAH)"
+                      checked={patient.pulmonaryArterialHypertension}
+                      onChange={(val) => updatePatient('pulmonaryArterialHypertension', val)}
+                      variant="danger"
+                    />
+                    <Checkbox
+                      label="Hepatic Impairment (Child-Pugh B/C)"
+                      checked={patient.hepaticImpairment}
+                      onChange={(val) => updatePatient('hepaticImpairment', val)}
+                      variant="danger"
+                    />
+                    <Checkbox
+                      label="History of CV Events (Stroke/MI)"
+                      checked={patient.priorCVEvents}
+                      onChange={(val) => updatePatient('priorCVEvents', val)}
+                      variant="danger"
+                    />
+                    <Checkbox
+                      label="History of Thromboembolism (DVT/PE)"
+                      checked={patient.priorThromboembolicEvents}
+                      onChange={(val) => updatePatient('priorThromboembolicEvents', val)}
+                      variant="danger"
+                    />
+                  </div>
+
+                  {esaStep === 1 && (
+                    <div className="mt-8 flex justify-end">
+                      <button
                         onClick={() => setEsaStep(2)}
                         className="bg-gradient-to-r from-rose-500 to-red-600 text-white px-8 py-3.5 rounded-xl text-base font-bold hover:shadow-lg hover:shadow-rose-200 transition-all flex items-center gap-2 hover:-translate-y-1"
-                       >
-                         Next: Clinical Status <ArrowDownCircle className="w-5 h-5" />
-                       </button>
-                     </div>
-                   )}
+                      >
+                        Next: Clinical Status <ArrowDownCircle className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Tier 2 */}
                 {esaStep >= 2 && (
                   <div ref={tier2Ref} className="bg-indigo-50/50 p-6 md:p-8 rounded-2xl border border-indigo-100 animate-fade-in shadow-sm">
-                     <h3 className="text-2xl font-bold text-indigo-800 mb-2 flex items-center gap-3">
-                       <div className="bg-indigo-200 p-1.5 rounded-lg"><Activity className="w-6 h-6 text-indigo-700"/></div>
-                       Tier 2: Clinical Responsiveness
-                     </h3>
-                     <p className="text-sm text-indigo-600/80 mb-6 font-bold uppercase tracking-wide ml-12">Evaluate Inflammatory Status</p>
-                     <div className="grid md:grid-cols-2 gap-4 ml-1">
-                        <Checkbox 
-                          label="ESA Hyporesponsiveness"
-                          checked={patient.esaHyporesponsive}
-                          onChange={(val) => updatePatient('esaHyporesponsive', val)}
-                        />
-                        <Checkbox 
-                          label="Elevated CRP (> 0.3 mg/dl)"
-                          checked={patient.highCRP}
-                          onChange={(val) => updatePatient('highCRP', val)}
-                        />
-                     </div>
-                     {esaStep === 2 && (
-                       <div className="mt-8 flex justify-end">
-                         <button
+                    <h3 className="text-2xl font-bold text-indigo-800 mb-2 flex items-center gap-3">
+                      <div className="bg-indigo-200 p-1.5 rounded-lg"><Activity className="w-6 h-6 text-indigo-700" /></div>
+                      Tier 2: Clinical Responsiveness
+                    </h3>
+                    <p className="text-sm text-indigo-600/80 mb-6 font-bold uppercase tracking-wide ml-12">Evaluate Inflammatory Status</p>
+                    <div className="grid md:grid-cols-2 gap-4 ml-1">
+                      <Checkbox
+                        label="ESA Hyporesponsiveness"
+                        checked={patient.esaHyporesponsive}
+                        onChange={(val) => updatePatient('esaHyporesponsive', val)}
+                      />
+                      <Checkbox
+                        label="Elevated CRP (> 0.3 mg/dl)"
+                        checked={patient.highCRP}
+                        onChange={(val) => updatePatient('highCRP', val)}
+                      />
+                    </div>
+                    {esaStep === 2 && (
+                      <div className="mt-8 flex justify-end">
+                        <button
                           onClick={() => setEsaStep(3)}
                           className="bg-gradient-to-r from-indigo-500 to-blue-600 text-white px-8 py-3.5 rounded-xl text-base font-bold hover:shadow-lg hover:shadow-indigo-200 transition-all flex items-center gap-2 hover:-translate-y-1"
-                         >
-                           Next: Preferences <ArrowDownCircle className="w-5 h-5" />
-                         </button>
-                       </div>
-                     )}
+                        >
+                          Next: Preferences <ArrowDownCircle className="w-5 h-5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -748,44 +756,44 @@ export default function App() {
                 {esaStep >= 3 && (
                   <div ref={tier3Ref} className="bg-slate-50 p-6 md:p-8 rounded-2xl border border-slate-200 animate-fade-in shadow-sm">
                     <h3 className="text-2xl font-bold text-slate-800 mb-2 flex items-center gap-3">
-                      <div className="bg-slate-200 p-1.5 rounded-lg"><FileText className="w-6 h-6 text-slate-700"/></div>
+                      <div className="bg-slate-200 p-1.5 rounded-lg"><User className="w-6 h-6 text-slate-700" /></div>
                       Tier 3: Patient Preferences & Logistics
                     </h3>
-                     <p className="text-sm text-slate-500 mb-6 font-bold uppercase tracking-wide ml-12">Administration Constraints</p>
+                    <p className="text-sm text-slate-500 mb-6 font-bold uppercase tracking-wide ml-12">Administration Constraints</p>
                     <div className="grid md:grid-cols-2 gap-4 ml-1">
-                       <Checkbox 
-                          label="No access to refrigeration (Cold Chain)"
-                          checked={patient.accessToRefrigeration === false}
-                          onChange={(val) => updatePatient('accessToRefrigeration', !val)}
-                        />
-                        <div className="flex flex-col md:flex-row md:items-center gap-4 bg-white p-5 border border-slate-200 rounded-xl shadow-sm">
-                          <Label>Preferred Route of Administration:</Label>
-                          <div className="flex gap-3">
-                            <button
-                              className={`px-6 py-2.5 text-base font-bold rounded-lg border-2 transition-all ${patient.preference === 'Oral' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-105' : 'bg-white border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-600'}`}
-                              onClick={() => updatePatient('preference', 'Oral')}
-                            >
-                              Oral
-                            </button>
-                            <button
-                              className={`px-6 py-2.5 text-base font-bold rounded-lg border-2 transition-all ${patient.preference === 'Injection' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-105' : 'bg-white border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-600'}`}
-                              onClick={() => updatePatient('preference', 'Injection')}
-                            >
-                              Injection
-                            </button>
-                          </div>
+                      <Checkbox
+                        label="No access to refrigeration (Cold Chain)"
+                        checked={patient.accessToRefrigeration === false}
+                        onChange={(val) => updatePatient('accessToRefrigeration', !val)}
+                      />
+                      <div className="flex flex-col gap-2">
+                        <Label>Preferred Route:</Label>
+                        <div className="flex gap-3">
+                          <button
+                            className={`flex-1 px-4 py-3 text-base font-bold rounded-xl border-2 transition-all ${patient.preference === 'Oral' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.02]' : 'bg-white border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-600'}`}
+                            onClick={() => updatePatient('preference', 'Oral')}
+                          >
+                            Oral
+                          </button>
+                          <button
+                            className={`flex-1 px-4 py-3 text-base font-bold rounded-xl border-2 transition-all ${patient.preference === 'Injection' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.02]' : 'bg-white border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-600'}`}
+                            onClick={() => updatePatient('preference', 'Injection')}
+                          >
+                            Injection
+                          </button>
                         </div>
+                      </div>
                     </div>
                     {esaStep === 3 && (
-                       <div className="mt-8 flex justify-end">
-                         <button
+                      <div className="mt-8 flex justify-end">
+                        <button
                           onClick={() => setEsaStep(4)}
                           className="bg-gradient-to-r from-teal-500 to-emerald-600 text-white px-10 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-teal-200 transition-all flex items-center gap-3 hover:-translate-y-1"
-                         >
-                           Generate Clinical Recommendation <CheckCircle className="w-6 h-6" />
-                         </button>
-                       </div>
-                     )}
+                        >
+                          Generate Clinical Recommendation <CheckCircle className="w-6 h-6" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -799,28 +807,28 @@ export default function App() {
 
           {/* ACTION BUTTONS */}
           <div className="mt-12 pt-8 border-t border-slate-100 flex justify-between items-center">
-             <button
+            <button
               onClick={handleBack}
               disabled={stage === 1}
               className={`flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-base transition-colors ${stage === 1 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-500 hover:bg-slate-100 hover:text-indigo-700'}`}
-             >
-               <ChevronLeft className="w-5 h-5" /> Back
-             </button>
+            >
+              <ChevronLeft className="w-5 h-5" /> Back
+            </button>
 
-             {/* Standard Next Button */}
-             {recommendation?.status !== 'stop' && stage !== Stage.ESAManagement && (
-               <button
+            {/* Standard Next Button */}
+            {recommendation?.status !== 'stop' && stage !== Stage.ESAManagement && (
+              <button
                 onClick={handleNext}
                 disabled={!canProceed()}
                 className={`flex items-center gap-2 px-10 py-3.5 rounded-xl font-bold text-lg transition-all shadow-lg
-                  ${!canProceed() 
-                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' 
+                  ${!canProceed()
+                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
                     : 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white hover:from-indigo-700 hover:to-blue-700 hover:shadow-indigo-200 hover:-translate-y-1'}
                 `}
-               >
-                 Proceed <ChevronRight className="w-6 h-6" />
-               </button>
-             )}
+              >
+                Proceed <ChevronRight className="w-6 h-6" />
+              </button>
+            )}
           </div>
 
         </Card>
@@ -830,13 +838,13 @@ export default function App() {
       <footer className="max-w-4xl mx-auto px-6 mt-20 mb-12 text-center text-slate-500 text-sm font-medium">
         <p className="mb-2">© 2026 KDIGO Anemia Management Tool. For Educational Use Only.</p>
         <p className="mb-8 opacity-80">Reference: KDIGO Clinical Practice Guidelines for Anemia in Chronic Kidney Disease.</p>
-        
+
         <div className="border-t border-slate-200/60 pt-8 max-w-2xl mx-auto">
-            <p className="uppercase tracking-widest text-xs font-bold text-slate-400 mb-4">Primary Literature</p>
-            <ul className="space-y-3 text-slate-500 text-xs md:text-sm opacity-90">
-                <li>1. Kidney International (2012) 2, 279–335; doi:10.1038/kisup.2012.33</li>
-                <li>2. Updates on HIF-PH Inhibitors in CKD Anemia (2024/2025 Clinical Reviews)</li>
-            </ul>
+          <p className="uppercase tracking-widest text-xs font-bold text-slate-400 mb-4">Primary Literature</p>
+          <ul className="space-y-3 text-slate-500 text-xs md:text-sm opacity-90">
+            <li>1. Kidney International (2012) 2, 279–335; doi:10.1038/kisup.2012.33</li>
+            <li>2. Updates on HIF-PH Inhibitors in CKD Anemia (2024/2025 Clinical Reviews)</li>
+          </ul>
         </div>
       </footer>
     </div>

@@ -2,19 +2,42 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Run and deploy your AI Studio app
+# Anemia Management Assistant
 
-This contains everything you need to run your app locally.
+This project is a React-based application for managing Anemia in CKD patients, based on 2026 KDIGO guidelines.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1MSpFEokhEqizwRL4Ezz9yhWbVKCHzlsV
+## Getting Started
 
-## Run Locally
+### Prerequisites
+- Node.js (v20 or higher recommended)
+- npm
 
-**Prerequisites:**  Node.js
+### Installation
 
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Available Scripts
+
+- `npm run dev`: Starts the development server.
+- `npm run build`: Builds the app for production.
+- `npm run preview`: Locally preview the production build.
+
+## Deployment
+
+This project uses **GitHub Actions** for automated deployment to **GitHub Pages**.
+
+1. Go to **Settings > Pages** in your GitHub repository.
+2. Under **Build and deployment**, ensure **Source** is set to **GitHub Actions**.
+3. Push changes to the `main` branch. The workflow will automatically build and deploy the application.
+
+## Operation Logs
+
+### Initial Setup (2026-01-06)
+- **Configured `package.json`**: Added necessary dependencies and type definitions.
+- **Setup GitHub Actions**: Created `.github/workflows/deploy.yml` for automated deployment to GitHub Pages.
+- **Configured `.gitignore`**: Added strict rules to ignore `.env`, `coverage`, and other unnecessary files.
+- **Documentation**: Updated `README.md` with usage instructions and operation logs.
