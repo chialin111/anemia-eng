@@ -184,10 +184,10 @@ export default function App() {
   const resultRef = useRef<HTMLDivElement>(null);
 
   const stages = [
-    { id: Stage.Screening, label: 'Screening' },
-    { id: Stage.IronTherapy, label: 'Iron Status' },
-    { id: Stage.FullWorkup, label: 'Workup' },
-    { id: Stage.ESAManagement, label: 'ESA/HIF-PHI' },
+    { id: Stage.Screening, label: 'Demographics' },
+    { id: Stage.IronTherapy, label: 'Iron Indices' },
+    { id: Stage.FullWorkup, label: 'Diff. Diagnosis' },
+    { id: Stage.ESAManagement, label: 'Therapeutic Selection' },
   ];
 
   const updatePatient = (field: keyof PatientState, value: any) => {
@@ -221,7 +221,7 @@ export default function App() {
       setTimeout(() => {
         setRecommendation(null);
         setStage(prev => prev + 1);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Scrolling handled by useEffect
       }, 600);
     }
   };
@@ -247,13 +247,18 @@ export default function App() {
   const handleNext = () => {
     setRecommendation(null);
     setStage(prev => prev + 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scrolling handled by useEffect
   };
 
   const handleBack = () => {
     setRecommendation(null);
     setStage(prev => Math.max(1, prev - 1));
   };
+
+  // Ensure scroll to top on stage change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [stage]);
 
   useEffect(() => {
     let result: DecisionResult | null = null;
@@ -321,7 +326,7 @@ export default function App() {
             <p className="text-indigo-100 text-lg mt-3 font-medium opacity-90 ml-1">Clinical Decision Support System</p>
           </div>
           <div className="hidden md:block text-sm text-cyan-100 border border-white/20 bg-white/10 px-5 py-2.5 rounded-full font-semibold backdrop-blur-md shadow-sm">
-            v1.0 • Guidelines Based
+            Professional Edition • v1.1
           </div>
         </div>
       </header>
@@ -362,26 +367,26 @@ export default function App() {
                     <div className="p-3 bg-sky-100 rounded-xl text-sky-600">
                         <Droplet className="w-8 h-8" strokeWidth={2.5} />
                     </div>
-                    <h2 className="text-3xl font-bold text-slate-800">Initial Assessment</h2>
+                    <h2 className="text-3xl font-bold text-slate-800">Patient Demographics & Labs</h2>
                 </div>
-                <p className="text-slate-500 text-lg pl-1">Patient demographics and initial blood work.</p>
+                <p className="text-slate-500 text-lg pl-1">Enter initial parameters to stratify patient risk.</p>
               </div>
 
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
-                  <Label>Patient Group</Label>
+                  <Label>Patient Stratification (CKD Stage)</Label>
                   <Select 
                     value={patient.group || ''} 
                     onChange={(e) => updatePatient('group', e.target.value as PatientGroup)}
                   >
-                    <option value="" disabled>Select Group...</option>
+                    <option value="" disabled>Select Cohort...</option>
                     {Object.values(PatientGroup).map(g => (
                       <option key={g} value={g}>{g}</option>
                     ))}
                   </Select>
                 </div>
                 <div>
-                  <Label>Sex</Label>
+                  <Label>Biological Sex</Label>
                   <Select 
                     value={patient.gender || ''} 
                     onChange={(e) => updatePatient('gender', e.target.value as Gender)}
@@ -393,7 +398,7 @@ export default function App() {
                   </Select>
                 </div>
                 <div className="md:col-span-1">
-                  <Label icon={<Thermometer className="w-4 h-4" />}>Hemoglobin (Hb) [g/dL]</Label>
+                  <Label icon={<Thermometer className="w-4 h-4" />}>Hemoglobin Concentration (Hb) [g/dL]</Label>
                   <Input 
                     type="number" 
                     placeholder="e.g. 10.5" 
@@ -413,14 +418,14 @@ export default function App() {
                     <div className="p-3 bg-indigo-100 rounded-xl text-indigo-600">
                         <Syringe className="w-8 h-8" strokeWidth={2.5} />
                     </div>
-                    <h2 className="text-3xl font-bold text-slate-800">Iron Therapy</h2>
+                    <h2 className="text-3xl font-bold text-slate-800">Iron Status Assessment</h2>
                 </div>
-                <p className="text-slate-500 text-lg pl-1">Evaluate iron stores and eligibility for supplementation.</p>
+                <p className="text-slate-500 text-lg pl-1">Evaluate absolute and functional iron deficiency.</p>
               </div>
 
               <div className="grid md:grid-cols-2 gap-8">
                  <div>
-                  <Label>Ferritin [ng/ml]</Label>
+                  <Label>Serum Ferritin [ng/ml]</Label>
                   <Input 
                     type="number" 
                     placeholder="e.g. 50" 
@@ -429,7 +434,7 @@ export default function App() {
                   />
                 </div>
                  <div>
-                  <Label>TSAT (Transferrin Saturation) [%]</Label>
+                  <Label>Transferrin Saturation (TSAT) [%]</Label>
                   <Input 
                     type="number" 
                     placeholder="e.g. 20" 
@@ -464,7 +469,7 @@ export default function App() {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-bold text-slate-600 mb-2">TIBC [µg/dL]</label>
+                          <label className="block text-sm font-bold text-slate-600 mb-2">Total Iron Binding Capacity (TIBC) [µg/dL]</label>
                           <Input 
                             type="number" 
                             placeholder="e.g. 300"
@@ -478,7 +483,7 @@ export default function App() {
 
                 <div className="flex flex-col justify-end md:col-span-2 mt-2">
                    <Checkbox 
-                    label="Patient has Active Infection?"
+                    label="Presence of Active Systemic Infection?"
                     checked={patient.hasActiveInfection}
                     onChange={(val) => updatePatient('hasActiveInfection', val)}
                     variant="danger"
@@ -490,7 +495,7 @@ export default function App() {
                 <div className="bg-sky-200 p-1.5 rounded-full shrink-0">
                     <Info className="w-5 h-5 text-sky-700" />
                 </div>
-                <span><span className="font-bold">Context:</span> {patient.group} • Hb {patient.hb} g/dL</span>
+                <span><span className="font-bold">Patient Profile Summary:</span> {patient.group} • Hb {patient.hb} g/dL</span>
               </div>
             </div>
           )}
@@ -503,16 +508,16 @@ export default function App() {
                     <div className="p-3 bg-violet-100 rounded-xl text-violet-600">
                         <Stethoscope className="w-8 h-8" strokeWidth={2.5} />
                     </div>
-                    <h2 className="text-3xl font-bold text-slate-800">Comprehensive Workup</h2>
+                    <h2 className="text-3xl font-bold text-slate-800">Differential Diagnosis</h2>
                 </div>
-                <p className="text-slate-500 text-lg pl-1">Check all findings. If none apply, select "All negative".</p>
+                <p className="text-slate-500 text-lg pl-1">Rule out secondary non-renal etiologies.</p>
               </div>
 
               <div className="space-y-6">
                  {/* Success Case */}
                  <Checkbox 
                   variant="success"
-                  label="All negative (no other cause found) → Diagnosis: Renal Anemia"
+                  label="Exclusion of secondary causes (Diagnosis: Anemia of CKD)"
                   checked={patient.workupAllNegative}
                   onChange={(val) => toggleWorkupItem('workupAllNegative', val)}
                 />
@@ -523,26 +528,26 @@ export default function App() {
                     <div className="w-full border-t border-slate-200"></div>
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="bg-white px-4 text-sm text-slate-400 uppercase tracking-widest font-extrabold">Or indicate positive findings</span>
+                    <span className="bg-white px-4 text-sm text-slate-400 uppercase tracking-widest font-extrabold">Identify Positive Findings</span>
                   </div>
                 </div>
 
                 {/* Positive Findings */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <Checkbox 
-                    label="Peripheral blood smear abnormal"
+                    label="Abnormal Peripheral Blood Smear"
                     checked={patient.workupSmear}
                     onChange={(val) => toggleWorkupItem('workupSmear', val)}
                     variant="danger"
                   />
                   <Checkbox 
-                    label="Haptoglobin & LDH abnormal (Hemolysis)"
+                    label="Hemolysis (Abnormal Haptoglobin/LDH)"
                     checked={patient.workupHemolysis}
                     onChange={(val) => toggleWorkupItem('workupHemolysis', val)}
                     variant="danger"
                   />
                   <Checkbox 
-                    label="High CRP (Inflammation)"
+                    label="Elevated CRP (Inflammation)"
                     checked={patient.workupInflammation}
                     onChange={(val) => toggleWorkupItem('workupInflammation', val)}
                     variant="danger"
@@ -554,31 +559,31 @@ export default function App() {
                     variant="danger"
                   />
                   <Checkbox 
-                    label="Liver Function abnormal"
+                    label="Hepatic Dysfunction (LFTs)"
                     checked={patient.workupLiver}
                     onChange={(val) => toggleWorkupItem('workupLiver', val)}
                     variant="danger"
                   />
                   <Checkbox 
-                    label="TSH abnormal (Thyroid)"
+                    label="Thyroid Dysfunction (TSH)"
                     checked={patient.workupThyroid}
                     onChange={(val) => toggleWorkupItem('workupThyroid', val)}
                     variant="danger"
                   />
                   <Checkbox 
-                    label="High PTH (Hyperparathyroidism)"
+                    label="Hyperparathyroidism (Elevated PTH)"
                     checked={patient.workupParathyroid}
                     onChange={(val) => toggleWorkupItem('workupParathyroid', val)}
                     variant="danger"
                   />
                   <Checkbox 
-                    label="M-protein/Light chains detected"
+                    label="Paraproteinemia (M-protein/Light chains)"
                     checked={patient.workupMyeloma}
                     onChange={(val) => toggleWorkupItem('workupMyeloma', val)}
                     variant="danger"
                   />
                   <Checkbox 
-                    label="Parasites detected (if indicated)"
+                    label="Parasitic Infection (If indicated)"
                     checked={patient.workupParasites}
                     onChange={(val) => toggleWorkupItem('workupParasites', val)}
                     variant="danger"
@@ -596,9 +601,9 @@ export default function App() {
                     <div className="p-3 bg-teal-100 rounded-xl text-teal-600">
                         <Pill className="w-8 h-8" strokeWidth={2.5} />
                     </div>
-                    <h2 className="text-3xl font-bold text-slate-800">ESA & HIF-PHI</h2>
+                    <h2 className="text-3xl font-bold text-slate-800">Pharmacological Management</h2>
                 </div>
-                <p className="text-slate-500 text-lg pl-1">Tiered assessment for medication selection.</p>
+                <p className="text-slate-500 text-lg pl-1">Sequential assessment for ESA vs. HIF-PHI selection.</p>
               </div>
 
               <div className="space-y-12">
@@ -607,13 +612,13 @@ export default function App() {
                 <div className="bg-rose-50/50 p-6 md:p-8 rounded-2xl border border-rose-100 animate-fade-in shadow-sm">
                    <h3 className="text-2xl font-bold text-rose-800 mb-2 flex items-center gap-3">
                      <div className="bg-rose-200 p-1.5 rounded-lg"><ShieldAlert className="w-6 h-6 text-rose-700"/></div>
-                     Tier 1: Major Clinical Factors
+                     Tier 1: Contraindications & Safety Profiles
                    </h3>
-                   <p className="text-sm text-rose-600/80 mb-6 font-bold uppercase tracking-wide ml-12">Contraindications & Safety</p>
+                   <p className="text-sm text-rose-600/80 mb-6 font-bold uppercase tracking-wide ml-12">Identify Major Risk Factors</p>
                    
                    <div className="grid md:grid-cols-2 gap-4 ml-1">
                       <Checkbox 
-                        label="Current Stroke or Thrombosis"
+                        label="Current Stroke or Active Thrombosis"
                         checked={patient.currentStrokeOrThrombosis}
                         onChange={(val) => updatePatient('currentStrokeOrThrombosis', val)}
                         variant="danger"
@@ -625,7 +630,7 @@ export default function App() {
                         variant="danger"
                       />
                       <Checkbox 
-                        label="Cannot tolerate ESA (allergy, HTN)"
+                        label="Documented Intolerance to ESA"
                         checked={patient.esaIntolerance}
                         onChange={(val) => updatePatient('esaIntolerance', val)}
                         variant="danger"
@@ -637,43 +642,43 @@ export default function App() {
                         variant="danger"
                       />
                       <Checkbox 
-                        label="History of Cancer (< 5yr remission)"
+                        label="History of Malignancy (< 5yr remission)"
                         checked={patient.historyOfCancer}
                         onChange={(val) => updatePatient('historyOfCancer', val)}
                         variant="danger"
                       />
                       <Checkbox 
-                        label="Polycystic Kidney Disease"
+                        label="Polycystic Kidney Disease (ADPKD)"
                         checked={patient.polycysticKidneyDisease}
                         onChange={(val) => updatePatient('polycysticKidneyDisease', val)}
                         variant="danger"
                       />
                       <Checkbox 
-                        label="Proliferative Retinal Disease"
+                        label="Proliferative Retinopathy"
                         checked={patient.proliferativeRetinalDisease}
                         onChange={(val) => updatePatient('proliferativeRetinalDisease', val)}
                         variant="danger"
                       />
                       <Checkbox 
-                        label="Pulmonary Arterial Hypertension"
+                        label="Pulmonary Arterial Hypertension (PAH)"
                         checked={patient.pulmonaryArterialHypertension}
                         onChange={(val) => updatePatient('pulmonaryArterialHypertension', val)}
                         variant="danger"
                       />
                       <Checkbox 
-                        label="Hepatic Impairment"
+                        label="Hepatic Impairment (Child-Pugh B/C)"
                         checked={patient.hepaticImpairment}
                         onChange={(val) => updatePatient('hepaticImpairment', val)}
                         variant="danger"
                       />
                       <Checkbox 
-                        label="Prior CV Events (Stroke/MI)"
+                        label="History of CV Events (Stroke/MI)"
                         checked={patient.priorCVEvents}
                         onChange={(val) => updatePatient('priorCVEvents', val)}
                         variant="danger"
                       />
                       <Checkbox 
-                        label="Prior Thromboembolic Events"
+                        label="History of Thromboembolism (DVT/PE)"
                         checked={patient.priorThromboembolicEvents}
                         onChange={(val) => updatePatient('priorThromboembolicEvents', val)}
                         variant="danger"
@@ -697,9 +702,9 @@ export default function App() {
                   <div ref={tier2Ref} className="bg-indigo-50/50 p-6 md:p-8 rounded-2xl border border-indigo-100 animate-fade-in shadow-sm">
                      <h3 className="text-2xl font-bold text-indigo-800 mb-2 flex items-center gap-3">
                        <div className="bg-indigo-200 p-1.5 rounded-lg"><Activity className="w-6 h-6 text-indigo-700"/></div>
-                       Tier 2: Clinical Status
+                       Tier 2: Clinical Responsiveness
                      </h3>
-                     <p className="text-sm text-indigo-600/80 mb-6 font-bold uppercase tracking-wide ml-12">Responsiveness & Inflammation</p>
+                     <p className="text-sm text-indigo-600/80 mb-6 font-bold uppercase tracking-wide ml-12">Evaluate Inflammatory Status</p>
                      <div className="grid md:grid-cols-2 gap-4 ml-1">
                         <Checkbox 
                           label="ESA Hyporesponsiveness"
@@ -707,7 +712,7 @@ export default function App() {
                           onChange={(val) => updatePatient('esaHyporesponsive', val)}
                         />
                         <Checkbox 
-                          label="High CRP (> 0.3 mg/dl)"
+                          label="Elevated CRP (> 0.3 mg/dl)"
                           checked={patient.highCRP}
                           onChange={(val) => updatePatient('highCRP', val)}
                         />
@@ -730,17 +735,17 @@ export default function App() {
                   <div ref={tier3Ref} className="bg-slate-50 p-6 md:p-8 rounded-2xl border border-slate-200 animate-fade-in shadow-sm">
                     <h3 className="text-2xl font-bold text-slate-800 mb-2 flex items-center gap-3">
                       <div className="bg-slate-200 p-1.5 rounded-lg"><FileText className="w-6 h-6 text-slate-700"/></div>
-                      Tier 3: Logistics
+                      Tier 3: Patient Preferences & Logistics
                     </h3>
-                     <p className="text-sm text-slate-500 mb-6 font-bold uppercase tracking-wide ml-12">Patient Preferences</p>
+                     <p className="text-sm text-slate-500 mb-6 font-bold uppercase tracking-wide ml-12">Administration Constraints</p>
                     <div className="grid md:grid-cols-2 gap-4 ml-1">
                        <Checkbox 
-                          label="No access to refrigeration"
+                          label="No access to refrigeration (Cold Chain)"
                           checked={patient.accessToRefrigeration === false}
                           onChange={(val) => updatePatient('accessToRefrigeration', !val)}
                         />
                         <div className="flex flex-col md:flex-row md:items-center gap-4 bg-white p-5 border border-slate-200 rounded-xl shadow-sm">
-                          <Label>Preferred Route:</Label>
+                          <Label>Preferred Route of Administration:</Label>
                           <div className="flex gap-3">
                             <button
                               className={`px-6 py-2.5 text-base font-bold rounded-lg border-2 transition-all ${patient.preference === 'Oral' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-105' : 'bg-white border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-600'}`}
@@ -763,7 +768,7 @@ export default function App() {
                           onClick={() => setEsaStep(4)}
                           className="bg-gradient-to-r from-teal-500 to-emerald-600 text-white px-10 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-teal-200 transition-all flex items-center gap-3 hover:-translate-y-1"
                          >
-                           Generate Recommendation <CheckCircle className="w-6 h-6" />
+                           Generate Clinical Recommendation <CheckCircle className="w-6 h-6" />
                          </button>
                        </div>
                      )}
@@ -799,7 +804,7 @@ export default function App() {
                     : 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white hover:from-indigo-700 hover:to-blue-700 hover:shadow-indigo-200 hover:-translate-y-1'}
                 `}
                >
-                 Next Step <ChevronRight className="w-6 h-6" />
+                 Proceed <ChevronRight className="w-6 h-6" />
                </button>
              )}
           </div>
@@ -809,14 +814,14 @@ export default function App() {
 
       {/* Footer */}
       <footer className="max-w-4xl mx-auto px-6 mt-20 mb-12 text-center text-slate-500 text-sm font-medium">
-        <p className="mb-2">© 2026 KDIGO Guideline Tool. This application is for educational and clinical support purposes only.</p>
-        <p className="mb-8 opacity-80">Always verify with official KDIGO Clinical Practice Guidelines for Anemia in CKD.</p>
+        <p className="mb-2">© 2026 KDIGO Anemia Management Tool. For Educational Use Only.</p>
+        <p className="mb-8 opacity-80">Reference: KDIGO Clinical Practice Guidelines for Anemia in Chronic Kidney Disease.</p>
         
         <div className="border-t border-slate-200/60 pt-8 max-w-2xl mx-auto">
-            <p className="uppercase tracking-widest text-xs font-bold text-slate-400 mb-4">Key References</p>
+            <p className="uppercase tracking-widest text-xs font-bold text-slate-400 mb-4">Primary Literature</p>
             <ul className="space-y-3 text-slate-500 text-xs md:text-sm opacity-90">
-                <li>1. Kidney International (2026) 109 (Suppl 1S): S1–S99</li>
-                <li>2. Nephrology Dialysis Transplantation (2024) 39(10):1710-1730</li>
+                <li>1. Kidney International (2012) 2, 279–335; doi:10.1038/kisup.2012.33</li>
+                <li>2. Updates on HIF-PH Inhibitors in CKD Anemia (2024/2025 Clinical Reviews)</li>
             </ul>
         </div>
       </footer>
