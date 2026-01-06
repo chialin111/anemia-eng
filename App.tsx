@@ -177,6 +177,7 @@ export default function App() {
   const [patient, setPatient] = useState<PatientState>(initialPatientState);
   const [recommendation, setRecommendation] = useState<DecisionResult | null>(null);
   const [showCalculator, setShowCalculator] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   
   const [esaStep, setEsaStep] = useState(1);
   const tier2Ref = useRef<HTMLDivElement>(null);
@@ -317,13 +318,26 @@ export default function App() {
         
         <div className="max-w-4xl mx-auto flex items-center justify-between relative z-10">
           <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold flex items-center gap-4 tracking-tight drop-shadow-sm">
-              <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-sm border border-white/20">
-                <Activity className="w-8 h-8 md:w-10 md:h-10 text-cyan-300" />
+            <h1 className="text-2xl md:text-3xl font-extrabold flex items-center gap-4 tracking-tight drop-shadow-sm">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-white/20 shrink-0 overflow-hidden p-1">
+                {!logoError ? (
+                  <img 
+                    src="https://upload.wikimedia.org/wikipedia/zh/thumb/3/3a/Changhua_Christian_Hospital_logo.svg/240px-Changhua_Christian_Hospital_logo.svg.png" 
+                    alt="Changhua Christian Medical Foundation Logo"
+                    className="w-full h-full object-contain"
+                    referrerPolicy="no-referrer"
+                    onError={() => setLogoError(true)}
+                  />
+                ) : (
+                  <div className="text-indigo-700 font-black text-xl">CCH</div>
+                )}
               </div>
-              KDIGO Anemia Manager
+              <div className="flex flex-col">
+                <span>Anemia Management Assistant</span>
+                <span className="text-sm md:text-lg font-medium text-cyan-100 opacity-90 mt-1">(based on 2026 KDIGO Guideline)</span>
+              </div>
             </h1>
-            <p className="text-indigo-100 text-lg mt-3 font-medium opacity-90 ml-1">Clinical Decision Support System</p>
+            <p className="text-indigo-100 text-sm md:text-base mt-3 font-medium opacity-90 ml-1">Clinical Decision Support System</p>
           </div>
           <div className="hidden md:block text-sm text-cyan-100 border border-white/20 bg-white/10 px-5 py-2.5 rounded-full font-semibold backdrop-blur-md shadow-sm">
             Professional Edition • v1.1
