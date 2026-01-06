@@ -323,7 +323,7 @@ export default function App() {
               <div className="w-14 h-14 md:w-16 md:h-16 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-white/20 shrink-0 overflow-hidden p-1">
                 {!logoError ? (
                   <img
-                    src="/cch_logo.png"
+                    src={`${import.meta.env.BASE_URL}cch_logo.png`}
                     alt="Changhua Christian Medical Foundation Logo"
                     className="w-full h-full object-contain"
                     referrerPolicy="no-referrer"
