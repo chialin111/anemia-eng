@@ -1,0 +1,5 @@
+{
+  "name": "KDIGO Anemia Manager",
+  "description": "Interactive clinical decision support tool for managing anemia in CKD patients based on KDIGO guidelines.",
+  "requestFramePermissions": []
+}
