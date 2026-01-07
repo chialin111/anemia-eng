@@ -804,13 +804,32 @@ export default function App() {
           <div ref={resultRef}>
             {/* Regulatory Warning for ND-CKD + HIF-PHI */}
             {recommendation?.title.includes('Recommendation: HIF-PHI') && patient.group === PatientGroup.ND_CKD && (
-              <div className="bg-amber-50 border-l-[6px] border-amber-500 text-amber-900 p-6 md:p-8 rounded-r-2xl shadow-sm mb-6 flex items-start gap-4 animate-fade-in mt-10">
-                <ShieldAlert className="w-8 h-8 text-amber-600 shrink-0 mt-1" />
-                <div>
-                  <h4 className="font-bold text-xl mb-2">Regulatory Warning (Taiwan FDA)</h4>
-                  <p className="font-medium opacity-90 leading-relaxed">
-                    HIF-PHI currently does not have Taiwan FDA indication for Non-dialysis CKD.
+              <div className="space-y-4 mb-8 mt-6 animate-fade-in">
+                {/* Compact Warning Box */}
+                <div className="bg-amber-50 border-l-4 border-amber-500 text-amber-900 p-4 rounded-r-xl shadow-sm flex items-center gap-3">
+                  <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0" />
+                  <div>
+                    <h4 className="font-bold text-base">Regulatory Warning (Taiwan FDA)</h4>
+                    <p className="text-sm font-medium opacity-90">
+                      HIF-PHI currently does not have Taiwan FDA indication for Non-dialysis CKD.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Shared Decision Making Context */}
+                <div className="bg-slate-50 border border-slate-200 p-5 rounded-xl">
+                  <h4 className="font-bold text-slate-700 flex items-center gap-2 mb-2">
+                    <Activity className="w-4 h-4 text-slate-500" />
+                    Clinical Strategy: Shared Decision Making (SDM)
+                  </h4>
+                  <p className="text-sm text-slate-600 mb-2 leading-relaxed">
+                    This patient category presents a therapeutic dilemma: <strong>Intolerance to ESA</strong> (Standard of Care) but <strong>HIF-PHI is off-label</strong>.
                   </p>
+                  <ul className="text-sm text-slate-600 space-y-1 list-disc list-inside bg-white p-3 rounded-lg border border-slate-100">
+                    <li>discuss the risks/benefits of off-label use.</li>
+                    <li>Evaluate alternative options (e.g., Red Cell Transfusion if symptomatic).</li>
+                    <li>Consult Nephrologist/Hematologist for expert opinion.</li>
+                  </ul>
                 </div>
               </div>
             )}
