@@ -729,7 +729,7 @@ export default function App() {
                     <p className="text-sm text-indigo-600/80 mb-6 font-bold uppercase tracking-wide ml-12">Evaluate Inflammatory Status</p>
                     <div className="grid md:grid-cols-2 gap-4 ml-1">
                       <Checkbox
-                        label="ESA Hyporesponsiveness"
+                        label="ESA Hyporesponsiveness (>300 (SC) or 450 (IV) IU/kg/week of EPO)"
                         checked={patient.esaHyporesponsive}
                         onChange={(val) => updatePatient('esaHyporesponsive', val)}
                       />
