@@ -826,7 +826,7 @@ export default function App() {
                     This patient category presents a therapeutic dilemma: <strong>Intolerance to ESA</strong> (Standard of Care) but <strong>HIF-PHI is off-label</strong>.
                   </p>
                   <ul className="text-sm text-slate-600 space-y-1 list-disc list-inside bg-white p-3 rounded-lg border border-slate-100">
-                    <li>discuss the risks/benefits of off-label use.</li>
+                    <li>Discuss the risks/benefits of off-label use.</li>
                     <li>Evaluate alternative options (e.g., Red Cell Transfusion if symptomatic).</li>
                     <li>Consult Nephrologist/Hematologist for expert opinion.</li>
                   </ul>
