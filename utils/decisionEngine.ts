@@ -24,12 +24,12 @@ export const evaluateScreening = (data: PatientState): DecisionResult => {
     };
   }
 
-  return { 
-    status: 'continue', 
-    title: 'Anemia Diagnosed', 
+  return {
+    status: 'continue',
+    title: 'Anemia Diagnosed',
     message: 'Hemoglobin levels indicate anemia. Proceed to Iron Therapy Assessment.',
     details: [
-        `Patient Hb: ${data.hb} g/dL`
+      `Patient Hb: ${data.hb} g/dL`
     ],
     recommendationType: 'urgent' // Red for "Anemia Detected"
   };
@@ -91,7 +91,7 @@ export const evaluateIronTherapy = (data: PatientState): DecisionResult => {
       rationale = 'Standard for HD patients.';
     }
   } else {
-    // Non-HD Groups (PD, ND-CKD, KTx)
+    // Non-HD Groups (PD, ND-CKD)
     if (
       (data.ferritin < 100 && data.tsat < 40) ||
       (data.ferritin >= 100 && data.ferritin <= 300 && data.tsat < 25)
@@ -138,17 +138,17 @@ export const evaluateWorkup = (data: PatientState): DecisionResult => {
     data.workupParasites;
 
   if (!hasSelection) {
-     return {
+    return {
       status: 'action_required',
       title: 'Perform Full Anemia Screening',
       message: 'Before diagnosing Renal Anemia, you must exclude other causes. Please perform the following tests and indicate results.',
-      recommendationType: 'info' 
+      recommendationType: 'info'
     };
   }
 
   // If "All Negative" is selected
   if (data.workupAllNegative) {
-     return {
+    return {
       status: 'continue', // Proceed to ESA
       title: 'Diagnosis: Renal Anemia',
       message: 'Other causes excluded and iron stores adequate. Proceed to ESA/HIF-PHI evaluation.',
@@ -169,11 +169,11 @@ export const evaluateWorkup = (data: PatientState): DecisionResult => {
   if (data.workupParasites) findings.push('Parasites detected: Refer to Infectious Disease');
 
   return {
-      status: 'stop',
-      title: 'Treat Underlying Cause',
-      message: 'Non-renal cause(s) identified. Address these issues before considering renal anemia treatment.',
-      details: findings,
-      recommendationType: 'urgent' // Red/Urgent
+    status: 'stop',
+    title: 'Treat Underlying Cause',
+    message: 'Non-renal cause(s) identified. Address these issues before considering renal anemia treatment.',
+    details: findings,
+    recommendationType: 'urgent' // Red/Urgent
   };
 };
 
@@ -190,7 +190,7 @@ export const evaluateESA = (data: PatientState): DecisionResult => {
   }
 
   // --- Priority 1: Tier 1 (Clinical History) ---
-  
+
   // 1a. Absolute Hold
   if (data.currentStrokeOrThrombosis) {
     return {
@@ -234,7 +234,7 @@ export const evaluateESA = (data: PatientState): DecisionResult => {
 
   // 1b. Favors ESA (Safety / Contraindications for HIF-PHI)
   if (tier1FavorESA.length > 0) {
-     return {
+    return {
       status: 'stop',
       title: 'Recommendation: ESA',
       message: 'Clinical history indicates ESA as the preferred choice.',

@@ -3,7 +3,6 @@ export enum PatientGroup {
   HD = 'Hemodialysis (HD)',
   PD = 'Peritoneal Dialysis (PD)',
   ND_CKD = 'Non-Dialysis CKD',
-  KTx = 'Kidney Transplant (KTx)',
 }
 
 export enum Gender {

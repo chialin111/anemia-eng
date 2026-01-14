@@ -875,8 +875,7 @@ export default function App() {
         <div className="border-t border-slate-200/60 pt-8 max-w-2xl mx-auto">
           <p className="uppercase tracking-widest text-xs font-bold text-slate-400 mb-4">Primary Literature</p>
           <ul className="space-y-3 text-slate-500 text-xs md:text-sm opacity-90">
-            <li>1. Kidney International (2012) 2, 279–335; doi:10.1038/kisup.2012.33</li>
-            <li>2. Updates on HIF-PH Inhibitors in CKD Anemia (2024/2025 Clinical Reviews)</li>
+            <li> Kidney Int. 2026 Jan;109(1S):S1-S99</li>
           </ul>
         </div>
       </footer>
